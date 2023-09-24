@@ -1,3 +1,11 @@
+# Extensions
+*.csv
+*.xlsx
+*.docx
+*.pptx
+*.txt
+*.pdf
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
