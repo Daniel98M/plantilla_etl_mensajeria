@@ -13,4 +13,8 @@ subprocess.call(['git', 'init'])
 subprocess.call(['git', 'add', '*'])
 subprocess.call(['git', 'commit', '-m', 'First commit'])
 
+# Creación del entorno virtual
+print(f'{MESSAGE_COLOR}Creando entorno virtual.{RESET_ALL}')
+subprocess.call(['python', '-m', 'venv', 'venv'])
+
 print(f'{MESSAGE_COLOR}Proyecto generado con éxito.{RESET_ALL}')

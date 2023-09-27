@@ -1,0 +1,20 @@
+# Configuración general del proyecto
+project_name: {{ cookiecutter.project_title }}
+
+# Credenciales
+credenciales:
+  dwh_onpremise:
+    service_name: ''
+    ip: ''
+    port: ''
+    usuario: ''
+    password: ''
+
+# Rutas
+rutas:
+  ruta_onedrive: ''
+  ruta_instantclient: ' /instantclient_19_11'
+
+# Notificaciones
+notificaciones:
+  slack: ''
