@@ -21,21 +21,28 @@ port = config['credenciales']['dwh_onpremise']['port']
 usuario = config['credenciales']['dwh_onpremise']['usuario']
 password = config['credenciales']['dwh_onpremise']['password']
 
-# Conexión con la base de datos - CX_Oracle
-cx_Oracle.init_oracle_client(config_dir = ruta_instantclient)
-dsn_tns = cx_Oracle.makedsn(ip, port, service_name=service_name)
-conn = cx_Oracle.connect(user=usuario, password=password, dsn=dsn_tns)
-cur = conn.cursor()
-
-# Conexión con sqlalchemy
-oracle_db = sa.create_engine('oracle+cx_oracle://ANALITICA_WOM:ANALI2023*5@10.41.87.18:1521/?service_name=DWHWOM')
-connection = oracle_db.connect()
-
 def consulta(query):
+    # Conexión con la base de datos - CX_Oracle
+    cx_Oracle.init_oracle_client(config_dir = ruta_instantclient)
+    dsn_tns = cx_Oracle.makedsn(ip, port, service_name=service_name)
+    conn = cx_Oracle.connect(user=usuario, password=password, dsn=dsn_tns)
+    cur = conn.cursor()
+
+    # Lectura del query
     df = pd.read_sql(query, con=conn)
     return(df)
 
 def registro_to_dwh(df, query):
+    # Conexión con la base de datos - CX_Oracle
+    cx_Oracle.init_oracle_client(config_dir = ruta_instantclient)
+    dsn_tns = cx_Oracle.makedsn(ip, port, service_name=service_name)
+    conn = cx_Oracle.connect(user=usuario, password=password, dsn=dsn_tns)
+    cur = conn.cursor()
+
+    # Conexión con sqlalchemy
+    oracle_db = sa.create_engine(f'oracle+cx_oracle://{usuario}:{password}@{ip}:{port}/?service_name={service_name}')
+    connection = oracle_db.connect()
+
     # Convertir DataFrame a lista de tuplas con valores convertidos a str y truncados
     rows = [tuple(str(val)[:2000] for val in row) for row in df.values]
 
@@ -49,4 +56,4 @@ def registro_to_dwh(df, query):
         conn.commit()
 
     # Cerramos la conexión
-    # conn.close()
+    conn.close()
