@@ -10,6 +10,11 @@ credenciales:
     usuario: ''
     password: ''
 
+  dwh_cloud:
+    dsn_con: ''
+    usuario: ''
+    password: ''
+
 # Rutas
 rutas:
   ruta_onedrive: ''

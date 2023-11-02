@@ -43,5 +43,10 @@ def registro_to_dwh(df, query):
         cur.executemany(query, chunk)
         conn.commit()
 
+def ejecutar_procedimiento(query):
+    cur.callproc(query)
+    conn.commit()
+
+def cerrar_conexion():
     # Cerramos la conexión
     conn.close()
