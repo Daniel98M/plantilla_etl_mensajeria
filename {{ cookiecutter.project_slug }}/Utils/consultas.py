@@ -47,6 +47,10 @@ def ejecutar_procedimiento(query):
     cur.callproc(query)
     conn.commit()
 
+def ejecutar_procedimiento_parametros(query, parametros):
+    cur.callproc(query, parametros)
+    conn.commit()
+
 def cerrar_conexion():
     # Cerramos la conexión
     conn.close()
