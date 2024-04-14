@@ -18,7 +18,7 @@ credenciales:
 # Rutas
 rutas:
   ruta_onedrive: ''
-  ruta_instantclient: ' /instantclient_19_11'
+  ruta_instantclient: ''
 
 # Notificaciones
 notificaciones:

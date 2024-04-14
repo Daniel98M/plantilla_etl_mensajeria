@@ -17,4 +17,9 @@ subprocess.call(['git', 'commit', '-m', 'First commit'])
 print(f'{MESSAGE_COLOR}Creando entorno virtual.{RESET_ALL}')
 subprocess.call(['python', '-m', 'venv', 'venv'])
 
+
+print(f'{MESSAGE_COLOR}Instalando librerías...{RESET_ALL}')
+subprocess.call(['venv\Scripts\activate'])
+subprocess.call(['pip', 'install', 'pandas', 'numpy', 'pyyaml', 'requests', 'matplotlib', 'seaborn'])
+
 print(f'{MESSAGE_COLOR}Proyecto generado con éxito.{RESET_ALL}')

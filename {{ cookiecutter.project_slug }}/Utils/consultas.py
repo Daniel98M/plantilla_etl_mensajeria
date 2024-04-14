@@ -7,9 +7,14 @@ import sqlalchemy as sa
 import yaml
 
 # Variables globales
-ruta_config = './config/config.yml'
-with open(ruta_config, "r") as archivo:
-    config = yaml.safe_load(archivo)
+try:
+    ruta_config = './config/config.yml'
+    with open(ruta_config, "r") as archivo:
+        config = yaml.safe_load(archivo)
+except:
+    ruta_config = '../config/config.yml'
+    with open(ruta_config, "r") as archivo:
+        config = yaml.safe_load(archivo)
 
 # Variables para la conexión
 ruta_instantclient = config['rutas']['ruta_instantclient']
@@ -19,7 +24,7 @@ usuario = config['credenciales']['dwh_cloud']['usuario']
 password = config['credenciales']['dwh_cloud']['password']
 
 # Conexión con la base de datos - CX_Oracle
-cx_Oracle.init_oracle_client(lib_dir="C:/Users/womsrvjm/Documents/instantclient_21_10")
+cx_Oracle.init_oracle_client(lib_dir=ruta_instantclient)
 
 conn = cx_Oracle.connect(user=f'{usuario}', password=f'{password}', dsn=dsn_con)
 cur = conn.cursor()
@@ -49,6 +54,10 @@ def ejecutar_procedimiento(query):
 
 def ejecutar_procedimiento_parametros(query, parametros):
     cur.callproc(query, parametros)
+    conn.commit()
+
+def ejecutar_query(query):
+    cur.execute(query)
     conn.commit()
 
 def cerrar_conexion():
