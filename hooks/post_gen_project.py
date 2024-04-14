@@ -19,9 +19,5 @@ subprocess.call(['python', '-m', 'venv', 'venv'])
 
 
 print(f'{MESSAGE_COLOR}Instalando librerías...{RESET_ALL}')
-env_path = 'venv\Scripts\activate.bat'
-
-subprocess.call([env_path], shell=True)
-subprocess.call(['pip', 'install', 'pandas', 'numpy', 'pyyaml', 'requests', 'matplotlib', 'seaborn', '--user'], shell=True)
 
 print(f'{MESSAGE_COLOR}Proyecto generado con éxito.{RESET_ALL}')
