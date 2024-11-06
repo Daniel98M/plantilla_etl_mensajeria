@@ -5,8 +5,11 @@ from src import generacion_bases
 
 from Utils.functions import send_message, config_logging
 
-dia = int(str(datetime.now()).replace('-', '')[:8])
-mes = int(str(datetime.now()).replace('-', '')[:6])
+# Variables Globales
+fecha = datetime.now()
+
+dia = int(str(fecha).replace('-', '')[:8])
+mes = int(str(fecha).replace('-', '')[:6])
 
 # Archivo de configuración
 ruta_config = './config/config.yml'
@@ -21,7 +24,7 @@ def main():
     print('Hello World')
 
     logger.info('Generando bases...')
-    generacion_bases.run(dia, config)
+    generacion_bases.run(config, fecha)
 
 # Entry Point
 if __name__ == '__main__':

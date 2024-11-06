@@ -3,7 +3,12 @@ import numpy as np
 
 from Utils.functions import send_message, config_logging
 
-def run(dia, config):
+def run(config, fecha):
+
+    # Variables globales
+    dia = int(str(fecha).replace('-', '')[:8])
+    mes = int(str(fecha).replace('-', '')[:6])
+
     logger = config_logging(dia)
     logger.info('Ejecutando generación de bases')
 

@@ -4,16 +4,17 @@ import numpy as np
 import cx_Oracle
 import sqlalchemy as sa
 
+import os
 import yaml
 
 # Variables globales
 try:
-    ruta_config = './config/config.yml'
-    with open(ruta_config, "r") as archivo:
+    RUTA_CONFIG = './config/config.yml'
+    with open(RUTA_CONFIG, "r", encoding='utf-8') as archivo:
         config = yaml.safe_load(archivo)
 except:
-    ruta_config = '../config/config.yml'
-    with open(ruta_config, "r") as archivo:
+    RUTA_CONFIG = '../config/config.yml'
+    with open(RUTA_CONFIG, "r", encoding='utf-8') as archivo:
         config = yaml.safe_load(archivo)
 
 # Variables para la conexión
@@ -21,7 +22,7 @@ ruta_instantclient = config['rutas']['ruta_instantclient']
 
 dsn_con = config['credenciales']['dwh_cloud']['dsn_con']
 usuario = config['credenciales']['dwh_cloud']['usuario']
-password = config['credenciales']['dwh_cloud']['password']
+password = os.getenv('SQL')
 
 # Conexión con la base de datos - CX_Oracle
 cx_Oracle.init_oracle_client(lib_dir=ruta_instantclient)

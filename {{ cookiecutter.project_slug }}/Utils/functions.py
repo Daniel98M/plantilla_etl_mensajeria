@@ -13,7 +13,8 @@ def config_logging(dia, append=True):
         filename=f'./Log/log_{dia}.txt',
         level=logging.INFO,
         format=LOG_FORMAT,
-        filemode=filemode
+        filemode=filemode,
+        encoding='utf-8'
     )
 
     # Inicializamos el logging
