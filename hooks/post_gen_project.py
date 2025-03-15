@@ -11,7 +11,7 @@ print(f'{MESSAGE_COLOR}Inicializando repositorio de git.{RESET_ALL}')
 
 subprocess.call(['git', 'init'])
 subprocess.call(['git', 'add', '*'])
-subprocess.call(['git', 'commit', '-m', 'First commit'])
+subprocess.call(['git', 'commit', '-m', 'chore ⚒️: First commit'])
 
 # Creación del entorno virtual
 print(f'{MESSAGE_COLOR}Creando entorno virtual.{RESET_ALL}')
