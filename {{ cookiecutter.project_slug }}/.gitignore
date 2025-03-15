@@ -3,7 +3,7 @@
 *.xlsx
 *.docx
 *.pptx
-*.txt
+*.log
 *.pdf
 
 ### Python ###
