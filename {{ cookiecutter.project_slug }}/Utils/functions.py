@@ -10,7 +10,7 @@ def config_logging(dia, append=True):
 
     # Configuramos nuestro logging
     logging.basicConfig(
-        filename=f'./Log/log_{dia}.txt',
+        filename=f'./Log/log_{dia}.log',
         level=logging.INFO,
         format=LOG_FORMAT,
         filemode=filemode,
