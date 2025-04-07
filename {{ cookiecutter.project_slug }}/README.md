@@ -3,6 +3,13 @@
 ## Description
 {{ cookiecutter.project_description }}
 
+---
+
+## 📌 Características  
+- ✅ .  
+
+---
+
 ## 🚀 Guía de Uso
 
 ### 🔧 1. Clonar el Repositorio
