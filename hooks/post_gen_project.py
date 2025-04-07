@@ -1,4 +1,4 @@
-import os
+"Script to run after the project is generated"
 import subprocess
 
 MESSAGE_COLOR = "\x1b[34m"
@@ -14,10 +14,17 @@ subprocess.call(['git', 'add', '*'])
 subprocess.call(['git', 'commit', '-m', 'chore ⚒️: First commit'])
 
 # Creación del entorno virtual
-print(f'{MESSAGE_COLOR}Creando entorno virtual.{RESET_ALL}')
-subprocess.call(['python', '-m', 'venv', 'venv'])
+ENV_MANAGER = '{{ cookiecutter.environment_manager }}'.lower()
 
+if ENV_MANAGER == 'virtualenv':
+    print(f'{MESSAGE_COLOR}Creando entorno virtual con virtualenv.{RESET_ALL}')
+    subprocess.call(['python', '-m', 'venv', 'venv'])
 
-print(f'{MESSAGE_COLOR}Instalando librerías...{RESET_ALL}')
+elif ENV_MANAGER == 'poetry':
+    print(f'{MESSAGE_COLOR}Creando entorno virtual con poetry.{RESET_ALL}')
+    subprocess.call(['poetry', 'init', '-n'])
+
+else:
+    print(f'{MESSAGE_COLOR}Sin entorno virtual. Puedes crearlo más tarde si lo deseas.{RESET_ALL}')
 
 print(f'{MESSAGE_COLOR}Proyecto generado con éxito.{RESET_ALL}')
