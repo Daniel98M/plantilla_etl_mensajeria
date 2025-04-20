@@ -1,7 +1,7 @@
 """Modulo de Utils"""
 import pandas as pd
 
-def resumen_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def resumen_dataframe(df: pd.DataFrame, sample: bool = False) -> pd.DataFrame:
     """Generación de resumen descriptivo de las variables del DataFrame
 
     Args:
@@ -16,21 +16,23 @@ def resumen_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         variable_name = variable
         tipo_dato = df[variable].dtype
         registros_esperados = len(df)
-        registros_disponibles = int(df[variable].count())
+        valores_nulos = int(df[variable].isnull().sum())
         unicos = len(df[variable].unique())
-        porc_reg_disponibles = round(registros_disponibles/registros_esperados * 100, 2)
         ejemplos = list(df[variable].sample(3))
 
         row_resume = pd.DataFrame({
             'Variable': [variable_name],
             'Tipo_Dato': [tipo_dato],
             'Registros_Esperados': [registros_esperados],
-            'Registros_Disponibles': [registros_disponibles],
-            '%Reg_Disponibles': [porc_reg_disponibles],
             'Valores_Unicos': [unicos],
+            'Valores_Nulos': [valores_nulos],
+            '%Valores_Nulos': [round(valores_nulos / registros_esperados * 100, 2)],
             'Ejemplos': [ejemplos]
         })
 
         df_resume = pd.concat([df_resume, row_resume])
 
-    return df_resume
+    if sample is False:
+        df_resume = df_resume.drop('Ejemplos', axis = 1)
+
+    return df_resume.reset_index(drop=True)
