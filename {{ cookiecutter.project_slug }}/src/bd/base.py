@@ -50,9 +50,7 @@ class DatabaseConnector(ABC):
             self.logger.error("Error de conexión: %s", str(e))
             raise ConnectionError(f"Error de conexión: {str(e)}") from e
 
-    def execute_get_query(
-        self, query: str, params: Optional[Dict] = None
-    ) -> pd.DataFrame:
+    def execute_get_query(self, query: str, params: Optional[Dict] = None) -> pd.DataFrame:
         """
         Ejecuta una consulta y devuelve un DataFrame
 
@@ -71,14 +69,15 @@ class DatabaseConnector(ABC):
             except Exception as e:
                 self.logger.error("Error en la consulta: %s", str(e))
                 raise QueryError(f"Error en la consulta: {str(e)}") from e
-
+    
+    @abstractmethod
     def execute_insert_df(
         self,
         df: pd.DataFrame,
         table_name: str,
         if_exists: str = "append",
         index: bool = False,
-        chunksize: int = 1000,
+        chunksize: int = 5000,
         **kwargs,
     ) -> int:
         """
