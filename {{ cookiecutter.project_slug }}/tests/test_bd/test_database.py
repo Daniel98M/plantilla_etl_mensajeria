@@ -1,16 +1,12 @@
 """
 Pruebas unitarias para el módulo de base de datos.
 """
-import sys
-sys.path.append('./')
-
 import pandas as pd
 import pandas.testing as tm
 
 import pytest
 
 from src.bd.base import DatabaseError, QueryError, InsertError
-
 from tests.mocks.mocks_bd import MockDatabaseConnector
 
 class TestDatabaseConnector:
