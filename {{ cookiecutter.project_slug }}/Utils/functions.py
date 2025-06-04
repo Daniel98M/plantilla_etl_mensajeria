@@ -1,32 +1,47 @@
-import logging
+"""
+Módulo para enviar mensajes a Slack mediante webhooks.
+"""
+import os
 import requests
 
-def config_logging(dia, append=True):
-    # Especificamos el formato del logging
-    LOG_FORMAT = "%(levelname)s %(asctime)s - %(message)s"
+def send_message(webhook_url: str, mensaje: str) -> bool:
+    """
+    Envía un mensaje a un canal de Slack usando un webhook.
+    
+    Args:
+        webhook_url: URL del webhook de Slack
+        mensaje: Texto del mensaje a enviar
+        
+    Returns:
+        bool: True si el mensaje se envió correctamente, False en caso de error
+    """
+    try:
+        payload = {'text': mensaje}
 
-    # Definimos el modo de escritura
-    filemode = 'a' if append == True else 'w'
+        response = requests.post(
+            webhook_url,
+            json=payload,
+            timeout=10
+        )
+        response.raise_for_status()
+        return True
 
-    # Configuramos nuestro logging
-    logging.basicConfig(
-        filename=f'./Log/log_{dia}.log',
-        level=logging.INFO,
-        format=LOG_FORMAT,
-        filemode=filemode,
-        encoding='utf-8'
-    )
+    except Exception as error:
+        print(f"Error al enviar mensaje a Slack: {error}")
+        return False
 
-    # Inicializamos el logging
-    logger = logging.getLogger()
+def get_env_value(env_var: str) -> str:
+    """Obtiene un valor de configuración.
+    
+    Args:
+        env_var: Nombre de la variable de entorno.
+        
+    Returns:
+        El valor de configuración o None si no se encuentra.
+    """
 
-    return logger
-
-def send_message(id, message):
-    # Ajustamos la solicitud de envio
-    result = requests.post(
-        id, 
-        json={
-            'text': message,
-        }
-    )
+    env_value = os.getenv(env_var)
+    if env_value is not None:
+        return env_value
+    else:
+        return None
