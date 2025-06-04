@@ -1,7 +1,6 @@
 """
 Módulo para enviar mensajes a Slack mediante webhooks.
 """
-import os
 import requests
 
 def send_message(webhook_url: str, mensaje: str) -> bool:
@@ -29,19 +28,3 @@ def send_message(webhook_url: str, mensaje: str) -> bool:
     except Exception as error:
         print(f"Error al enviar mensaje a Slack: {error}")
         return False
-
-def get_env_value(env_var: str) -> str:
-    """Obtiene un valor de configuración.
-    
-    Args:
-        env_var: Nombre de la variable de entorno.
-        
-    Returns:
-        El valor de configuración o None si no se encuentra.
-    """
-
-    env_value = os.getenv(env_var)
-    if env_value is not None:
-        return env_value
-    else:
-        return None
