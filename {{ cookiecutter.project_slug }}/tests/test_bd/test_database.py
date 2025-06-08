@@ -2,9 +2,12 @@
 Pruebas unitarias para el módulo de base de datos.
 """
 import pandas as pd
-import pandas.testing as tm
 
+from pathlib import Path
 import pytest
+
+import sys
+sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from src.bd.base import DatabaseError, QueryError, InsertError
 from tests.mocks.mocks_bd import MockDatabaseConnector
