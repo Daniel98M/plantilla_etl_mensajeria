@@ -4,6 +4,7 @@ Este módulo proporciona una interfaz para conectarse a bases de datos Oracle ut
 variables de entorno para la configuración sensible. Las variables deben estar definidas
 en un archivo .env en el directorio raíz del proyecto.
 """
+import os
 from typing import Dict, Optional
 from pathlib import Path
 
@@ -16,8 +17,8 @@ from dotenv import load_dotenv
 env_path = Path(__file__).parent.parent.parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
-from base import DatabaseConnector, QueryError, DatabaseError
-from utils.functions import get_env_value
+from src.bd.base import DatabaseConnector, QueryError, DatabaseError
+from src.utils.logger.logger import get_logger
 
 class OracleConnector(DatabaseConnector):
     """Conector para bases de datos Oracle.
@@ -28,15 +29,16 @@ class OracleConnector(DatabaseConnector):
     """
     
     def __init__(self):
-        """Inicializa el conector Oracle."""
-        self._cursor = None
-        self._connection = None
+       """Inicializa el conector Oracle."""
+       self.logger = get_logger(__name__)
+       self._cursor = None
+       self._connection = None
         
-        # Configuración de conexión
-        self.user = get_env_value('DB_ORACLE_USER')
-        self.password = get_env_value('DB_ORACLE_PASSWORD')
-        self.dsn = get_env_value('DB_ORACLE_DSN')
-        self.lib_dir = get_env_value('DB_ORACLE_LIB_DIR')
+       # Configuración de conexión
+       self.user = os.getenv('DB_ORACLE_USER', '')
+       self.password = os.getenv('DB_ORACLE_PASSWORD', '')
+       self.dsn = os.getenv('DB_ORACLE_DSN', '')
+       self.lib_dir = os.getenv('DB_ORACLE_LIB_DIR', '')
             
     def connect(self) -> None:
         """Establece la conexión a la base de datos Oracle.
@@ -58,7 +60,7 @@ class OracleConnector(DatabaseConnector):
         except cx_Oracle.DatabaseError as error:
             error_msg = f"Error al conectar a Oracle: {str(error)}"
             self.logger.error(error_msg)
-            raise DatabaseError(error_msg)
+            raise DatabaseError(error_msg) from error
     
     def disconnect(self) -> None:
         """Cierra la conexión a la base de datos."""
@@ -87,10 +89,10 @@ class OracleConnector(DatabaseConnector):
                 df = pd.read_sql(query, con=self._connection)
 
                 return df
-        except Exception as e:
-            error = f"Error al ejecutar la consulta: {str(e)}"
-            self.logger.error(error)
-            raise QueryError(error) from e
+        except Exception as error:
+            error_msg = f"Error al ejecutar la consulta: {str(error)}"
+            self.logger.error(error_msg)
+            raise QueryError(error_msg) from error
 
     def execute_insert_df(self, df: pd.DataFrame, query: str, chunksize: int = 5000):
         """Función de conveniencia para insertar datos desde un DataFrame.
@@ -109,10 +111,16 @@ class OracleConnector(DatabaseConnector):
         total_rows = len(rows)
 
         # Inserción de los registros
-        for i in range(0, total_rows, chunksize):
-            chunk = rows[i:i+chunksize]
-            self._cursor.executemany(query, chunk)
-            self._connection.commit()
+        try:
+            for i in range(0, total_rows, chunksize):
+                chunk = rows[i:i+chunksize]
+                self._cursor.executemany(query, chunk)
+                self._connection.commit()
+        except Exception as error:
+            self._connection.rollback()
+            error_msg = f"Error al insertar los datos: {str(error)}"
+            self.logger.error(error_msg)
+            raise QueryError(error_msg) from error
 
     def execute_procedure(self, procedure_name: str, parameters: Optional[list] = None):
         """Ejecuta un procedimiento almacenado.
@@ -121,18 +129,18 @@ class OracleConnector(DatabaseConnector):
             procedure_name: Nombre del procedimiento a ejecutar.
             parameters: Lista de parámetros para el procedimiento (opcional).
         """
-        with self.connection():
-            try:
+        try:
+            with self.connection():
                 if parameters is None:
                     self._cursor.callproc(procedure_name)
                 else:
                     self._cursor.callproc(procedure_name, parameters)
                 self._connection.commit()
-            except Exception as e:
-                self._connection.rollback()
-                error = f"Error al ejecutar el procedimiento {procedure_name}: {str(e)}"
-                self.logger.error(error)
-                raise QueryError(error) from e
+        except Exception as error:
+            self._connection.rollback()
+            error_msg = f"Error al ejecutar el procedimiento {procedure_name}: {str(error)}"
+            self.logger.error(error_msg)
+            raise QueryError(error_msg) from error
     
     def execute_query(self, query: str) -> None:
         """Ejecuta una consulta.
@@ -140,11 +148,11 @@ class OracleConnector(DatabaseConnector):
         Args:
             query: Sentencia SQL a ejecutar.
         """
-        with self.connection():
-            try:
+        try:
+            with self.connection():
                 self._cursor.execute(query)
                 self._connection.commit()
-            except Exception as error:
-                error_msg = f"Error al ejecutar el query: {str(error)}"
-                self.logger.error(error_msg)
-                raise QueryError(error_msg)
+        except Exception as error:
+            error_msg = f"Error al ejecutar el query: {str(error)}"
+            self.logger.error(error_msg)
+            raise QueryError(error_msg) from error
