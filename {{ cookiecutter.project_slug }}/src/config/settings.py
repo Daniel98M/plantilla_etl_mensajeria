@@ -1,36 +1,40 @@
-"""Configuración general del proyecto."""
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
-# Carga las variables del archivo .env si existe
-load_dotenv()
+# Cargar variables desde un archivo .env si existe
+BASE_DIR = Path(__file__).resolve().parents[2]
+dotenv_path = BASE_DIR / ".env"
+if dotenv_path.exists():
+    load_dotenv(dotenv_path)
 
-# Configuración general
-class Settings:
-    """Configuración general del proyecto."""
+# === ENTORNO ===
+ENV = os.getenv("ENV", "development")
 
-    # Entorno
-    ENV: str = os.getenv("ENV", "development")  # development, production, test
+# === BASE PATHS ===
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR / "data"))
+MODELS_DIR = Path(os.getenv("MODELS_DIR", BASE_DIR / "models"))
+LOGS_DIR = Path(os.getenv("LOGS_DIR", BASE_DIR / "logs"))
 
-    # Base de datos
-    DB_USER: str = os.getenv("DB_USER", "user")
-    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "password")
-    DB_HOST: str = os.getenv("DB_HOST", "localhost")
-    DB_NAME: str = os.getenv("DB_NAME", "my_database")
-    DB_PORT: int = int(os.getenv("DB_PORT", '5432'))
+# === BASE DE DATOS ===
+DB_CONFIG = {
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "host": os.getenv("DB_HOST", "localhost"),
+    "name": os.getenv("DB_NAME"),
+    "port": os.getenv("DB_PORT", '5432'),
+}
 
-    # API keys
-    API_URL: str = os.getenv("API_URL", "")
-    API_KEY: str = os.getenv("API_KEY", "")
+# === API EXTERNA ===
+API_CONFIG = {
+    "url": os.getenv("API_URL"),
+    "key": os.getenv("API_KEY"),
+}
 
-    # Rutas
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    DATA_DIR = os.path.join(BASE_DIR, "data")
-    MODELS_DIR = os.path.join(BASE_DIR, "models")
-    LOGS_DIR = os.path.join(BASE_DIR, "logs")
-
-    # Parámetros para modelos (ejemplo)
-    RANDOM_SEED = 13
-    TEST_SIZE = 0.2
-    
-settings = Settings()
+# === NOTIFICACIONES SLACK ===
+SLACK_CONFIG = {
+    "webhook": os.getenv("SLACK_WEBHOOK"),
+    "channel": os.getenv("SLACK_CHANNEL", "#general"),
+    "username": os.getenv("SLACK_USERNAME", "bot"),
+}
