@@ -4,7 +4,6 @@ Este módulo proporciona una interfaz para conectarse a bases de datos Oracle ut
 variables de entorno para la configuración sensible. Las variables deben estar definidas
 en un archivo .env en el directorio raíz del proyecto.
 """
-import os
 from typing import Dict, Optional
 from pathlib import Path
 
@@ -12,34 +11,36 @@ import cx_Oracle
 import pandas as pd
 
 from dotenv import load_dotenv
+from src.config.settings import DB_CONFIG
 
 # Cargar variables de entorno desde el archivo .env
-env_path = Path(__file__).parent.parent.parent.parent / '.env'
+env_path = Path(__file__).parent.parent.parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
 from src.bd.base import DatabaseConnector, QueryError, DatabaseError
 from src.utils.logger.logger import get_logger
 
+
 class OracleConnector(DatabaseConnector):
     """Conector para bases de datos Oracle.
-    
+
     Esta clase implementa la funcionalidad específica para conectarse a bases de datos
     Oracle y ejecutar consultas, manteniendo compatibilidad con la interfaz definida
     en DatabaseConnector.
     """
-    
+
     def __init__(self):
-       """Inicializa el conector Oracle."""
-       self.logger = get_logger(__name__)
-       self._cursor = None
-       self._connection = None
-        
-       # Configuración de conexión
-       self.user = os.getenv('DB_ORACLE_USER', '')
-       self.password = os.getenv('DB_ORACLE_PASSWORD', '')
-       self.dsn = os.getenv('DB_ORACLE_DSN', '')
-       self.lib_dir = os.getenv('DB_ORACLE_LIB_DIR', '')
-            
+        """Inicializa el conector Oracle."""
+        self.logger = get_logger(__name__)
+        self._cursor = None
+        self._connection = None
+
+        # Configuración de conexión
+        self.user = DB_CONFIG["user"]
+        self.password = DB_CONFIG["password"]
+        self.dsn = DB_CONFIG["dsn"]
+        self.lib_dir = DB_CONFIG["lib_dir"]
+
     def connect(self) -> None:
         """Establece la conexión a la base de datos Oracle.
 
@@ -48,12 +49,10 @@ class OracleConnector(DatabaseConnector):
         """
         if self.lib_dir:
             cx_Oracle.init_oracle_client(lib_dir=self.lib_dir)
-        
+
         try:
             self._connection = cx_Oracle.connect(
-                user=self.user,
-                password=self.password,
-                dsn=self.dsn
+                user=self.user, password=self.password, dsn=self.dsn
             )
             self._cursor = self._connection.cursor()
             self.logger.info("Conexión a Oracle establecida correctamente.")
@@ -61,25 +60,27 @@ class OracleConnector(DatabaseConnector):
             error_msg = f"Error al conectar a Oracle: {str(error)}"
             self.logger.error(error_msg)
             raise DatabaseError(error_msg) from error
-    
+
     def disconnect(self) -> None:
         """Cierra la conexión a la base de datos."""
         if self._cursor:
             self._cursor.close()
             self._cursor = None
-        
+
         if self._connection:
             self._connection.close()
             self._connection = None
             self.logger.info("Conexión a Oracle cerrada correctamente.")
-    
-    def execute_get_query(self, query: str, params: Optional[Dict] = None) -> pd.DataFrame:
+
+    def execute_get_query(
+        self, query: str, params: Optional[Dict] = None
+    ) -> pd.DataFrame:
         """Ejecuta una consulta y devuelve los resultados como un DataFrame.
-        
+
         Args:
             query: Consulta SQL a ejecutar.
             params: Parámetros para la consulta (opcional).
-            
+
         Returns:
             DataFrame con los resultados de la consulta.
         """
@@ -96,13 +97,13 @@ class OracleConnector(DatabaseConnector):
 
     def execute_insert_df(self, df: pd.DataFrame, query: str, chunksize: int = 5000):
         """Función de conveniencia para insertar datos desde un DataFrame.
-        
+
         Args:
             df: DataFrame con los datos a insertar.
             query: Consulta SQL para la inserción.
             config_path: Ruta al archivo de configuración.
             **kwargs: Parámetros adicionales para el conector.
-            
+
         Returns:
             Número de filas insertadas.
         """
@@ -113,7 +114,7 @@ class OracleConnector(DatabaseConnector):
         # Inserción de los registros
         try:
             for i in range(0, total_rows, chunksize):
-                chunk = rows[i:i+chunksize]
+                chunk = rows[i : i + chunksize]
                 self._cursor.executemany(query, chunk)
                 self._connection.commit()
         except Exception as error:
@@ -124,7 +125,7 @@ class OracleConnector(DatabaseConnector):
 
     def execute_procedure(self, procedure_name: str, parameters: Optional[list] = None):
         """Ejecuta un procedimiento almacenado.
-        
+
         Args:
             procedure_name: Nombre del procedimiento a ejecutar.
             parameters: Lista de parámetros para el procedimiento (opcional).
@@ -138,13 +139,15 @@ class OracleConnector(DatabaseConnector):
                 self._connection.commit()
         except Exception as error:
             self._connection.rollback()
-            error_msg = f"Error al ejecutar el procedimiento {procedure_name}: {str(error)}"
+            error_msg = (
+                f"Error al ejecutar el procedimiento {procedure_name}: {str(error)}"
+            )
             self.logger.error(error_msg)
             raise QueryError(error_msg) from error
-    
+
     def execute_query(self, query: str) -> None:
         """Ejecuta una consulta.
-        
+
         Args:
             query: Sentencia SQL a ejecutar.
         """
