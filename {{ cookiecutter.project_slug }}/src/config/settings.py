@@ -21,9 +21,12 @@ LOGS_DIR = Path(os.getenv("LOGS_DIR", BASE_DIR / "logs"))
 DB_CONFIG = {
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD"),
+    "dsn": os.getenv("DB_DSN"),
+    "lib_dir": os.getenv("DB_LIB_DIR"),
+
     "host": os.getenv("DB_HOST", "localhost"),
-    "name": os.getenv("DB_NAME"),
-    "port": os.getenv("DB_PORT", '5432'),
+    "name": os.getenv("DB_NAME", "bd_test"),
+    "port": os.getenv("DB_PORT", '5432')
 }
 
 # === API EXTERNA ===

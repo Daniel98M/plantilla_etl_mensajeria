@@ -7,7 +7,7 @@ en un archivo .env en el directorio raíz del proyecto.
 from typing import Dict, Optional
 from pathlib import Path
 
-import cx_Oracle
+import oracledb
 import pandas as pd
 
 from dotenv import load_dotenv
@@ -47,16 +47,18 @@ class OracleConnector(DatabaseConnector):
         Raises:
             ConnectionError: Si no se puede establecer la conexión.
         """
-        if self.lib_dir:
-            cx_Oracle.init_oracle_client(lib_dir=self.lib_dir)
-
         try:
-            self._connection = cx_Oracle.connect(
-                user=self.user, password=self.password, dsn=self.dsn
+            if self.lib_dir:
+                oracledb.init_oracle_client(lib_dir=self.lib_dir)
+
+            self._connection = oracledb.connect(
+                user=self.user,
+                password=self.password,
+                dsn=self.dsn
             )
             self._cursor = self._connection.cursor()
             self.logger.info("Conexión a Oracle establecida correctamente.")
-        except cx_Oracle.DatabaseError as error:
+        except oracledb.Error as error:
             error_msg = f"Error al conectar a Oracle: {str(error)}"
             self.logger.error(error_msg)
             raise DatabaseError(error_msg) from error
@@ -86,10 +88,10 @@ class OracleConnector(DatabaseConnector):
         """
         try:
             with self.connection():
-                query = query.format(**params)
+                query = query.format(**params) if params else query
                 df = pd.read_sql(query, con=self._connection)
-
                 return df
+            
         except Exception as error:
             error_msg = f"Error al ejecutar la consulta: {str(error)}"
             self.logger.error(error_msg)
@@ -132,10 +134,10 @@ class OracleConnector(DatabaseConnector):
         """
         try:
             with self.connection():
-                if parameters is None:
-                    self._cursor.callproc(procedure_name)
-                else:
+                if parameters:
                     self._cursor.callproc(procedure_name, parameters)
+                else:
+                    self._cursor.callproc(procedure_name)
                 self._connection.commit()
         except Exception as error:
             self._connection.rollback()
