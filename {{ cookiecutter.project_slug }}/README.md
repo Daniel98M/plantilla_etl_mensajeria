@@ -65,5 +65,5 @@ Crea un archivo .env en la raíz del proyecto y define:
 Vas a la consola y ejecutas el siguiente comando.
 
 ```bash
-python main.py
+python run.py
 ```
