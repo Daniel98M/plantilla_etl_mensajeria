@@ -41,3 +41,11 @@ SLACK_CONFIG = {
     "channel": os.getenv("SLACK_CHANNEL", "#general"),
     "username": os.getenv("SLACK_USERNAME", "bot"),
 }
+
+# === SFT DYNAMO ===
+SFTP_CONFIG_DYNAMO = {
+    "host": os.getenv("SFTP_HOST_D"),
+    "port": os.getenv("SFTP_PORT_D"),
+    "user": os.getenv("SFTP_USER_D"),
+    "password": os.getenv("SFTP_PASSWORD_D"),
+}
